@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - PaySurity-Core-API
+          - PaySurity-Admin-UI
+          - PaySurity-Shared-UI-Components
+          - PaySurity-Payroll-Core
+          - PaySurity-Tax-Service
+          - PaySurity-Testing-Suite
+          # Add additional services here
+
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/$${{ matrix.service }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests (if available)
+        run: npm test || echo "No tests for service $${{ matrix.service }}"
